@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Floot NG - Admin - All Requests Workflow</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--floot:#8B3DFF;--bg:#0B0B10}
+body{background:var(--bg);color:#fff;font-family:Inter,sans-serif}
+.app{max-width:900px;margin:0 auto;padding:16px}
+.header{background:linear-gradient(90deg,#1A1226,#120D1D);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+@media(max-width:600px){.stats{grid-template-columns:1fr 1fr}}
+.stat{background:linear-gradient(160deg,#1A1226,#120D1D);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:14px}
+.stat b{font-size:22px;display:block;margin-top:4px}
+.card{background:linear-gradient(160deg,#1A1226,#120D1D);border:1px solid rgba(255,255,255,.07);border-radius:20px;padding:16px;margin-bottom:12px}
+.badge{font-size:9px;font-weight:900;padding:4px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.1)}
+.b-searching{color:#FBBF24;background:rgba(251,191,36,.12);border-color:rgba(251,191,36,.25)}
+.b-accepted{color:#6EE7B7;background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.25)}
+.b-delivered{color:#60A5FA;background:rgba(96,165,250,.12);border-color:rgba(96,165,250,.25)}
+.small{font-size:11px;color:rgba(255,255,255,.45)}
+.input{width:100%;background:#0B0B10;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:10px 12px;color:#fff;font-size:13px}
+.btn{border:none;padding:8px 14px;border-radius:10px;font-weight:800;font-size:12px;cursor:pointer}
+.btn-del{background:rgba(239,68,68,.15);color:#F87171;border:1px solid rgba(239,68,68,.25)}
+table{width:100%;border-collapse:collapse}
+th{font-size:10px;letter-spacing:.1em;color:rgba(255,255,255,.4);text-align:left;padding:10px 8px;border-bottom:1px solid rgba(255,255,255,.08)}
+td{font-size:12px;padding:12px 8px;border-bottom:1px solid rgba(255,255,255,.05);vertical-align:top}
+.workflow{display:flex;gap:8px;align-items:center;margin-top:8px}
+.w-dot{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:12px}
+.w-line{width:24px;height:2px;background:rgba(255,255,255,.1)}
+</style>
+</head>
+<body>
+
+<div id="gate" style="position:fixed;inset:0;z-index:10000;background:radial-gradient(120% 120% at 50% 0%, #1E1140 0%, #0B0B10 70%);display:flex;align-items:center;justify-content:center;padding:20px">
+  <div style="width:100%;max-width:380px;background:linear-gradient(160deg,#1D1433,#110D1B);border:1px solid rgba(139,61,255,.25);border-radius:24px;padding:28px;text-align:center">
+    <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(90deg,#8B3DFF,#C77DFF);display:grid;place-items:center;margin:0 auto 14px"><i class="fa-solid fa-lock" style="color:#fff;font-size:22px"></i></div>
+    <div style="font-weight:900;letter-spacing:.08em;font-size:16px">FLOOT ADMIN ACCESS</div>
+    <div class="small" style="margin-top:6px">Enter admin code to view all requests</div>
+    <input id="codeInput" type="password" placeholder="Enter code" style="width:100%;margin-top:18px;background:#0B0B10;border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:14px;color:#fff;font-size:14px;outline:none;text-align:center;letter-spacing:.2em">
+    <button id="unlockBtn" style="width:100%;margin-top:12px;background:linear-gradient(90deg,#8B3DFF,#9D5CFF);border:none;color:#fff;font-weight:900;padding:14px;border-radius:14px;cursor:pointer;letter-spacing:.06em">UNLOCK</button>
+    <div id="codeMsg" class="small" style="margin-top:10px;color:#F87171;min-height:16px"></div>
+    <div class="small" style="margin-top:14px;opacity:.5">Protected • floot-delivery</div>
+  </div>
+</div>
+<script>
+(function(){
+  const CODE="Dumani";
+  const gate=document.getElementById("gate");
+  const input=document.getElementById("codeInput");
+  const btn=document.getElementById("unlockBtn");
+  const msg=document.getElementById("codeMsg");
+  if(sessionStorage.getItem("floot_admin_ok")==="1"){ gate.style.display="none"; return; }
+  function unlock(){
+    if(input.value.trim()===CODE){
+      sessionStorage.setItem("floot_admin_ok","1");
+      gate.style.display="none";
+    } else {
+      msg.textContent="❌ Wrong code";
+      input.value="";
+      input.focus();
+      input.style.borderColor="rgba(239,68,68,.5)";
+      setTimeout(()=>input.style.borderColor="rgba(255,255,255,.12)",1000);
+    }
+  }
+  btn.addEventListener("click", unlock);
+  input.addEventListener("keydown", e=>{ if(e.key==="Enter") unlock(); });
+  input.focus();
+})();
+</script>
+
+<div class="app">
+  <div class="header">
+    <div><div style="font-weight:900;letter-spacing:.08em;background:linear-gradient(90deg,#8B3DFF,#C77DFF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:18px">FLOOT NG ADMIN</div><div class="small" id="conn">CONNECTING TO floot-delivery...</div></div>
+    <div style="display:flex;gap:8px"><select id="filter" class="input" style="width:130px"><option value="all">All Status</option><option value="searching">Searching</option><option value="accepted">Accepted</option><option value="delivered">Delivered</option></select><button id="exportBtn" class="btn" style="background:#8B3DFF;color:#fff">Export CSV</button></div>
+  </div>
+  <div class="stats">
+    <div class="stat"><span class="small">TOTAL REQUESTS</span><b id="total">0</b><span class="small" id="today">Today: 0</span></div>
+    <div class="stat"><span class="small" style="color:#FBBF24">SEARCHING</span><b id="searching" style="color:#FBBF24">0</b><span class="small">Waiting for driver</span></div>
+    <div class="stat"><span class="small" style="color:#6EE7B7">ACCEPTED / ACTIVE</span><b id="accepted" style="color:#6EE7B7">0</b><span class="small">On the road</span></div>
+    <div class="stat"><span class="small" style="color:#60A5FA">DELIVERED + REVENUE</span><b id="delivered" style="color:#60A5FA">0</b><span class="small" id="revenue">₦0 earned</span></div>
+  </div>
+  <div class="card">
+    <div style="font-size:11px;font-weight:800;letter-spacing:.12em;color:rgba(255,255,255,.5);margin-bottom:12px">FIREBASE WORKFLOW - LIVE REQUESTS</div>
+    <div style="overflow:auto">
+      <table>
+        <thead><tr><th>WORKFLOW</th><th>ROUTE / ITEM</th><th>OFFER / OTP</th><th>DRIVER / CUSTOMER</th><th>TIME</th><th></th></tr></thead>
+        <tbody id="tbody"><tr><td colspan="6" class="small" style="text-align:center;padding:30px">Connecting to Firestore...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, query, orderBy, limit, onSnapshot, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyBVIJq5napb_egiLdKhGtySZoPeLUkY9Q4",
+  authDomain: "floot-delivery.firebaseapp.com",
+  projectId: "floot-delivery",
+  storageBucket: "floot-delivery.firebasestorage.app",
+  messagingSenderId: "786230599434",
+  appId: "1:786230599434:web:e1913bd8c2e69a7e1c64f3"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+let allData=[], filterVal="all";
+const q = query(collection(db, "delivery_requests"), orderBy("createdAt","desc"), limit(100));
+onSnapshot(q, (snap)=>{
+  document.getElementById("conn").textContent="✅ CONNECTED - "+snap.size+" docs in floot-delivery/delivery_requests - LIVE";
+  document.getElementById("conn").style.color="#6EE7B7";
+  allData = snap.docs.map(d=> ({id:d.id,...d.data()}));
+  render();
+});
+function render(){
+  const today = new Date().toDateString();
+  const todayCount = allData.filter(d=> d.createdAt && new Date(d.createdAt).toDateString()===today).length || allData.length;
+  document.getElementById("total").textContent=allData.length;
+  document.getElementById("today").textContent="Today: "+todayCount;
+  document.getElementById("searching").textContent=allData.filter(d=>d.status==="searching").length;
+  document.getElementById("accepted").textContent=allData.filter(d=>d.status==="accepted").length;
+  document.getElementById("delivered").textContent=allData.filter(d=>d.status==="delivered").length;
+  const rev = allData.filter(d=>d.status==="delivered").reduce((s,r)=>s+(r.offerAmount||0),0);
+  document.getElementById("revenue").textContent="₦"+rev.toLocaleString()+" earned";
+  const filtered = filterVal==="all"? allData : allData.filter(d=>d.status===filterVal);
+  if(filtered.length===0){
+    document.getElementById("tbody").innerHTML=`<tr><td colspan="6" class="small" style="text-align:center;padding:30px">No ${filterVal} requests</td></tr>`;
+    return;
+  }
+  document.getElementById("tbody").innerHTML = filtered.map(r=>{
+    const wf = r.status==="searching"?
+      `<div class="workflow"><div class="w-dot" style="background:rgba(251,191,36,.2);color:#FBBF24"><i class="fa-solid fa-magnifying-glass"></i></div><div class="w-line"></div><div class="w-dot" style="background:rgba(255,255,255,.06);color:rgba(255,255,255,.3)"><i class="fa-solid fa-motorcycle"></i></div><div class="w-line"></div><div class="w-dot" style="background:rgba(255,255,255,.06);color:rgba(255,255,255,.3)"><i class="fa-solid fa-check"></i></div></div>` :
+      r.status==="accepted"?
+      `<div class="workflow"><div class="w-dot" style="background:rgba(16,185,129,.2);color:#6EE7B7"><i class="fa-solid fa-check"></i></div><div class="w-line" style="background:#10B981"></div><div class="w-dot" style="background:rgba(16,185,129,.2);color:#6EE7B7"><i class="fa-solid fa-motorcycle"></i></div><div class="w-line"></div><div class="w-dot" style="background:rgba(255,255,255,.06)"><i class="fa-solid fa-check"></i></div></div>` :
+      `<div class="workflow"><div class="w-dot" style="background:rgba(16,185,129,.2);color:#6EE7B7"><i class="fa-solid fa-check"></i></div><div class="w-line" style="background:#10B981"></div><div class="w-dot" style="background:rgba(16,185,129,.2);color:#6EE7B7"><i class="fa-solid fa-check"></i></div><div class="w-line" style="background:#10B981"></div><div class="w-dot" style="background:rgba(96,165,250,.2);color:#60A5FA"><i class="fa-solid fa-box"></i></div></div>`;
+    return `<tr>
+      <td>${wf}<br><span class="badge ${r.status==="searching"?"b-searching":r.status==="accepted"?"b-accepted":"b-delivered"}">${r.status.toUpperCase()}</span></td>
+      <td><b style="font-size:13px">${r.pickup||"?"} → ${r.dropoff||"?"}</b><br><span class="small">${r.distance||0}km • ${r.itemType||""}<br>${r.description||""}</span></td>
+      <td><b>₦${(r.offerAmount||0).toLocaleString()}</b><br><span class="small">Calc: ₦${r.calculatedTotal||0}</span><br><span style="font-family:monospace;letter-spacing:.2em;font-weight:800;background:rgba(139,61,255,.15);padding:2px 6px;border-radius:6px;font-size:12px">${r.otp||"----"}</span></td>
+      <td><span class="small">Driver:</span> <b style="font-size:11px">${r.driverId||"<i style='color:#FBBF24'>waiting...</i>"}</b><br><span class="small">Cust:</span> <span style="font-size:10px">${r.customerId||"?"}</span><br><span class="small">ID: ${r.id.slice(0,8)}...</span></td>
+      <td><span class="small">${r.createdAt? new Date(r.createdAt).toLocaleString() : "live"}</span></td>
+      <td><button class="btn btn-del" data-id="${r.id}">Delete</button></td>
+    </tr>`;
+  }).join("");
+  document.querySelectorAll(".btn-del").forEach(b=>{
+    b.addEventListener("click", async ()=>{
+      if(!confirm("Delete this request?")) return;
+      await deleteDoc(doc(db, "delivery_requests", b.dataset.id));
+    });
+  });
+}
+document.getElementById("filter").addEventListener("change", e=>{ filterVal=e.target.value; render(); });
+document.getElementById("exportBtn").addEventListener("click", ()=>{
+  const csv = "id,pickup,dropoff,distance,itemType,offerAmount,status,driverId,customerId,otp,createdAt\n" + allData.map(r=> `${r.id},"${r.pickup}","${r.dropoff}",${r.distance},"${r.itemType}",${r.offerAmount},${r.status},${r.driverId},${r.customerId},${r.otp},"${r.createdAt}"`).join("\n");
+  const blob=new Blob([csv],{type:"text/csv"}); const url=URL.createObjectURL(blob);
+  const a=document.createElement("a"); a.href=url; a.download="floot_requests.csv"; a.click();
+});
+</script>
+</body>
+</html>
